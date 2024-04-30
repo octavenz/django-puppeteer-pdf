@@ -8,6 +8,7 @@ version = "0.1.5"
 description = "Provides Django views to wrap the HTML to PDF conversion using puppeteer."
 readme = "README.rst"
 authors = [
+  {name = "Namespace", email = "admin@incuna.com"},
   {name = "Octave", email = "hello@octave.nz"}
 ]
 maintainers = [
@@ -16,9 +17,9 @@ maintainers = [
 classifiers = [
 
 ]
-license = {text = "BSD-2-Clause"}
+license = {text = "MIT"}
 dependencies = [
-  
+
 ]
 
 [project.optional-dependencies]

@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/octavenz/puppeteer_pdf/issues.
+The best way to send feedback is to file an issue at https://github.com/octavenz/django-puppeteer-pdf/issues.
 
 If you are proposing a feature:
 
@@ -59,15 +59,15 @@ Get Started!
 
 Ready to contribute? Here's how to set up `puppeteer_pdf` for local development.
 
-1. Fork the `puppeteer_pdf` repo on GitHub.
+1. Fork the `django-puppeteer-pdf` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/puppeteer_pdf.git
+    $ git clone git@github.com:your_name_here/django-puppeteer-pdf.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
     $ mkvirtualenv puppeteer_pdf
-    $ cd puppeteer_pdf/
+    $ cd django-puppeteer-pdf/
     $ python setup.py develop
 
 4. Create a branch for local development::
@@ -103,8 +103,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/octavenz/puppeteer_pdf/pull_requests
+3. The pull request should work for Python 3.10+. Check
+   https://github.com/octavenz/django-puppeteer-pdf/pulls
    and make sure that the tests pass for all supported Python versions.
 
 Tips
@@ -126,7 +126,7 @@ $ bump2version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+Github Actions will then deploy to PyPI if tests pass.
 
 Code of Conduct
 ---------------
