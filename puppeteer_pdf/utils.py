@@ -9,7 +9,10 @@ from itertools import chain
 from tempfile import NamedTemporaryFile
 
 from django.core.files import File
-from django.utils.encoding import smart_text
+try:
+    from django.utils.encoding import smart_text
+except ImportError:
+    from django.utils.encoding import smart_str as smart_text
 
 try:
     from urllib.request import pathname2url
