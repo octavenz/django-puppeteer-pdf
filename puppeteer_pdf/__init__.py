@@ -4,4 +4,4 @@ if 'DJANGO_SETTINGS_MODULE' in os.environ:
 
 __author__ = "Namespace, Octave"
 __email__ = 'hello@octave.nz'
-__version__ = '0.1.5'
+__version__ = '0.2.0'
