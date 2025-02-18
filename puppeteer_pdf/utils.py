@@ -53,50 +53,50 @@ def _options_to_args(**options):
     return flags
 
 
-def puppeteer_to_pdf(input, output=None, **kwargs):
-    """
-    Converts html to PDF using page.pdf(options)
-    https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
-
-    input: file path or URL of the html to be converted.
-    output: Optional output file path. If None, the output is returned.
-    **kwargs: Passed to puppeteer page.pdf via options
-    example usage:
-        puppeteer_to_pdf(input='/tmp/example.html')
-    """
-    debug = getattr(settings, 'PUPPETEER_PDF_DEBUG', os.environ.get('PUPPETEER_PDF_DEBUG', settings.DEBUG))
-
-    input = file_path(input)
-
-    if not output:
-        output = '/tmp/{0}.pdf'.format(uuid.uuid4())
-
-    # Default options:
-    options = getattr(settings, 'PUPPETEER_PDF_CMD_OPTIONS', None)
-    if options is None:
-        options = {'path': output}
-    else:
-        options = copy(options)
-    options.update(kwargs)
-
-    cmd = 'PUPPETEER_PDF_CMD'
-    CHROME_LOCATION = 'puppeteer-pdf'  # default
-    cmd = getattr(settings, cmd, os.environ.get(cmd, CHROME_LOCATION))
-
-    ck_args = list(chain([cmd],
-                         [input],
-                         _options_to_args(**options)))
-
-    sub_cmd = ' '.join(ck_args)
-    if debug:
-        print(sub_cmd)
-    subprocess.call(sub_cmd, shell=True)
-
-    if os.path.isfile(output):
-        with open(output, 'rb') as f:
-            return File(f).read()
-    else:
-        return None
+# def puppeteer_to_pdf(input, output=None, **kwargs):
+#     """
+#     Converts html to PDF using page.pdf(options)
+#     https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
+#
+#     input: file path or URL of the html to be converted.
+#     output: Optional output file path. If None, the output is returned.
+#     **kwargs: Passed to puppeteer page.pdf via options
+#     example usage:
+#         puppeteer_to_pdf(input='/tmp/example.html')
+#     """
+#     debug = getattr(settings, 'PUPPETEER_PDF_DEBUG', os.environ.get('PUPPETEER_PDF_DEBUG', settings.DEBUG))
+#
+#     input = file_path(input)
+#
+#     if not output:
+#         output = '/tmp/{0}.pdf'.format(uuid.uuid4())
+#
+#     # Default options:
+#     options = getattr(settings, 'PUPPETEER_PDF_CMD_OPTIONS', None)
+#     if options is None:
+#         options = {'path': output}
+#     else:
+#         options = copy(options)
+#     options.update(kwargs)
+#
+#     cmd = 'PUPPETEER_PDF_CMD'
+#     CHROME_LOCATION = 'puppeteer-pdf'  # default
+#     cmd = getattr(settings, cmd, os.environ.get(cmd, CHROME_LOCATION))
+#
+#     ck_args = list(chain([cmd],
+#                          [input],
+#                          _options_to_args(**options)))
+#
+#     sub_cmd = ' '.join(ck_args)
+#     if debug:
+#         print(sub_cmd)
+#     subprocess.call(sub_cmd, shell=True)
+#
+#     if os.path.isfile(output):
+#         with open(output, 'rb') as f:
+#             return File(f).read()
+#     else:
+#         return None
 
 
 def file_path(path):
