@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "django-puppeteer-pdf"
@@ -32,35 +32,48 @@ classifiers = [
     "Framework :: Django"
 ]
 license = {text = "MIT"}
+
+requires-python = ">=3.10"
 dependencies = [
-
+    "django >= 4.0"
 ]
 
-[project.optional-dependencies]
-dev = [
-    "coverage",  # testing
-    "mypy",  # linting
-    "pytest",  # testing
-    "ruff"  # linting
-]
+#[project.optional-dependencies]
+#dev = [
+#    "coverage",  # testing
+#    "mypy",  # linting
+#    "pytest",  # testing
+#    "ruff"  # linting
+#]
 
 [project.urls]
-
 bugs = "https://github.com/octavenz/django-puppeteer-pdf/issues"
 changelog = "https://github.com/octavenz/django-puppeteer-pdf/blob/master/changelog.md"
 homepage = "https://github.com/octavenz/django-puppeteer-pdf"
 
-[tool.setuptools]
-package-dir = {"puppeteer_pdf" = "puppeteer_pdf"}
+#[tool.setuptools]
+#package-dir = {"puppeteer_pdf" = "puppeteer_pdf"}
 
-[tool.setuptools.package-data]
-"*" = ["*.*"]
-
-
+#[tool.setuptools.package-data]
+#"*" = ["*.*"]
 
 
-# Mypy
-# ----
+
+
+[tool.poetry]
+packages = [{include = "puppeteer_pdf", from = "."}]
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest-django = "^4.10.0"
+
+#[tool.poetry.group.dev]
+#optional = true
+#
+#[tool.poetry.group.dev.dependencies]
+#ruff = "^0.9.6"
 
 [tool.mypy]
 files = "."

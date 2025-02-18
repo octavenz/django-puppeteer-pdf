@@ -1,0 +1,18 @@
+services:
+    pdf-service:
+        hostname: django-puppeteer-pdf-service
+        image: kernldigital/pdf-service
+        ports:
+            - "3020:3020"
+
+    django-client:
+        hostname: django-puppeteer-pdf-client
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            -   ".:/backend/django/src"
+        stdin_open: true
+        tty: true
+        command: bash
+#        entrypoint: sh -c
