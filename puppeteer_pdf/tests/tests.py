@@ -237,7 +237,7 @@ class TestViews(TestCase):
         self.assertEqual(response.filename, None)
         self.assertEqual(response.header_template, None)
         self.assertEqual(response.footer_template, None)
-        self.assertEqual(response.cmd_options, {})
+        self.assertEqual(response.options, {})
         self.assertFalse(response.has_header('Content-Disposition'))
 
         # Render to temporary file
@@ -254,18 +254,20 @@ class TestViews(TestCase):
         self.assertTrue(pdf_content.endswith(b'%%EOF'))
 
         # Footer
-        cmd_options = {}
-        response = PDFTemplateResponse(request=request,
-                                       template=self.template,
-                                       context=context,
-                                       filename=self.pdf_filename,
-                                       show_content_in_browser=show_content,
-                                       footer_template=self.footer_template,
-                                       cmd_options=cmd_options)
+        options = {}
+        response = PDFTemplateResponse(
+            request=request,
+            template=self.template,
+            context=context,
+            filename=self.pdf_filename,
+            show_content_in_browser=show_content,
+            footer_template=self.footer_template,
+            options=options,
+        )
         self.assertEqual(response.filename, self.pdf_filename)
         self.assertEqual(response.header_template, None)
         self.assertEqual(response.footer_template, self.footer_template)
-        self.assertEqual(response.cmd_options, cmd_options)
+        self.assertEqual(response.options, options)
         self.assertTrue(response.has_header('Content-Disposition'))
 
         footer_template = loader.get_template(self.footer_template)
@@ -350,20 +352,20 @@ class TestViews(TestCase):
     def test_pdf_template_view_unicode_to_browser(self):
         self.test_pdf_template_view_unicode(show_content=True)
 
-    def test_get_cmd_options(self):
-        # Default cmd_options
+    def test_get_options(self):
+        # Default options
         view = PDFTemplateView()
-        self.assertEqual(view.cmd_options, PDFTemplateView.cmd_options)
-        self.assertEqual(PDFTemplateView.cmd_options, {})
+        self.assertEqual(view.options, PDFTemplateView.options)
+        self.assertEqual(PDFTemplateView.options, {})
 
-        # Instantiate with new cmd_options
-        cmd_options = {'orientation': 'landscape'}
-        view = PDFTemplateView(cmd_options=cmd_options)
-        self.assertEqual(view.cmd_options, cmd_options)
-        self.assertEqual(PDFTemplateView.cmd_options, {})
+        # Instantiate with new options
+        options = {"orientation": "landscape"}
+        view = PDFTemplateView(options=options)
+        self.assertEqual(view.options, options)
+        self.assertEqual(PDFTemplateView.options, {})
 
-        # Update local instance of cmd_options
+        # Update local instance of options
         view = PDFTemplateView()
-        view.cmd_options.update(cmd_options)
-        self.assertEqual(view.cmd_options, cmd_options)
-        self.assertEqual(PDFTemplateView.cmd_options, {})
+        view.options.update(options)
+        self.assertEqual(view.options, options)
+        self.assertEqual(PDFTemplateView.options, {})

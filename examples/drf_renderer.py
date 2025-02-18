@@ -16,19 +16,19 @@ class PDFReportRendererPuppeteer(BaseRenderer):
         context = {}
 
         pdf = render_pdf_from_template(
-            input_template='table_renderer_template.html',
-            header_template='pdf_renderer_header.html',
-            footer_template='pdf_renderer_footer.html',
+            input_template="table_renderer_template.html",
+            header_template="pdf_renderer_header.html",
+            footer_template="pdf_renderer_footer.html",
             context=context,
-            cmd_options={
-                'format': 'A3',
-                'scale': '0.9',
-                'landscape': True,
-                'displayHeaderFooter': True,
-                'marginTop': '90px',
-                'marginLeft': '50px',
-                'marginRight': '50px',
-                'marginBottom': '50px',
-            }
+            options={
+                "format": "A3",
+                "scale": "0.9",
+                "landscape": True,
+                "displayHeaderFooter": True,
+                "marginTop": "90px",
+                "marginLeft": "50px",
+                "marginRight": "50px",
+                "marginBottom": "50px",
+            },
         )
         return PDFResponse(pdf)

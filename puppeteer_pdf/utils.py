@@ -8,6 +8,7 @@ from copy import copy
 from itertools import chain
 from tempfile import NamedTemporaryFile
 
+import requests
 from django.core.files import File
 try:
     from django.utils.encoding import smart_text
@@ -107,23 +108,18 @@ def file_path(path):
     return path
 
 
-def convert_to_pdf(filename, header_filename=None, footer_filename=None, cmd_options=None):
+def convert_to_pdf(content: str, header: str = "", footer: str = "", options: dict = None) -> bytes:
     # Clobber header_html and footer_html only if filenames are
-    # provided. These keys may be in self.cmd_options as hardcoded
+    # provided. These keys may be in self.options as hardcoded
     # static files.
     # The argument `filename` may be a string or a list. However, puppeteer_pdf
     # will coerce it into a list if a string is passed.
-    cmd_options = cmd_options if cmd_options else {}
+    options = options or {}
+    debug = getattr(settings, "PUPPETEER_PDF_DEBUG", os.environ.get("PUPPETEER_PDF_DEBUG", settings.DEBUG))
 
-    if header_filename is not None:
-        cmd_options['headerTemplate'] = file_path(header_filename)
-        # with open(header_filename, 'r') as f:
-        #     cmd_options['headerTemplate'] = "'{}'".format(f.read().replace('\n', ''))
-    if footer_filename is not None:
-        cmd_options['footerTemplate'] = file_path(footer_filename)
-        # with open(footer_filename, 'r') as f:
-        #     cmd_options['footerTemplate'] = "'{}'".format(f.read().replace('\n', ''))
-    return puppeteer_to_pdf(input=filename, **cmd_options)
+    response = requests.post(settings.PUPPETEER_PDF_URL, json={"header": header, "footer": footer, "body": content})
+    response.raise_for_status()
+    return response.content
 
 
 class RenderedFile(object):
@@ -152,42 +148,32 @@ class RenderedFile(object):
             self.temporary_file.close()
 
 
-def render_pdf_from_template(input_template, header_template, footer_template, context, request=None, cmd_options=None):
+def render_pdf_from_template(
+    input_template, header_template, footer_template, context, request=None, options=None
+) -> bytes:
     # For basic usage. Performs all the actions necessary to create a single
     # page PDF from a single template and context.
-    cmd_options = cmd_options if cmd_options else {}
+    options = options if options else {}
 
-    header_filename = footer_filename = None
+    header_content = footer_content = ""
 
     # Main content.
-    input_file = RenderedFile(
-        template=input_template,
-        context=context,
-        request=request
-    )
+    input_content = render_template(template=input_template, context=context, request=request)
 
     # Optional. For header template argument.
     if header_template:
-        header_file = RenderedFile(
-            template=header_template,
-            context=context,
-            request=request
-        )
-        header_filename = header_file.filename
+        header_content = render_template(template=header_template, context=context, request=request)
 
     # Optional. For footer template argument.
     if footer_template:
-        footer_file = RenderedFile(
-            template=footer_template,
-            context=context,
-            request=request
-        )
-        footer_filename = footer_file.filename
+        footer_content = render_template(template=footer_template, context=context, request=request)
 
-    return convert_to_pdf(filename=input_file.filename,
-                          header_filename=header_filename,
-                          footer_filename=footer_filename,
-                          cmd_options=cmd_options)
+    return convert_to_pdf(
+        content=input_content,
+        header=header_content,
+        footer=footer_content,
+        options=options,
+    )
 
 
 def content_disposition_filename(filename):
@@ -262,9 +248,7 @@ def make_absolute_paths(content):
     return content
 
 
-def render_to_temporary_file(template, context, request=None, mode='w+b',
-                             bufsize=-1, suffix='.html', prefix='tmp',
-                             dir=None, delete=True):
+def render_template(template, context, request=None):
     if django.VERSION < (1, 8):
         # If using a version of Django prior to 1.8, ensure ``context`` is an
         # instance of ``Context``
@@ -281,6 +265,13 @@ def render_to_temporary_file(template, context, request=None, mode='w+b',
 
     content = smart_text(content)
     content = make_absolute_paths(content)
+    return content
+
+
+def render_to_temporary_file(
+    template, context, request=None, mode="w+b", bufsize=-1, suffix=".html", prefix="tmp", dir=None, delete=True
+):
+    content = render_template(template, context, request)
 
     try:
         # Python3 has 'buffering' arg instead of 'bufsize'
