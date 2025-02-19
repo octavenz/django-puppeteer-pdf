@@ -114,10 +114,13 @@ def convert_to_pdf(content: str, header: str = "", footer: str = "", options: di
     # static files.
     # The argument `filename` may be a string or a list. However, puppeteer_pdf
     # will coerce it into a list if a string is passed.
-    options = options or {}
-    debug = getattr(settings, "PUPPETEER_PDF_DEBUG", os.environ.get("PUPPETEER_PDF_DEBUG", settings.DEBUG))
+    params = {"debug": getattr(settings, "PUPPETEER_PDF_DEBUG", os.environ.get("PUPPETEER_PDF_DEBUG", settings.DEBUG))}
+    if options:
+        params.update(options)
 
-    response = requests.post(settings.PUPPETEER_PDF_URL, json={"header": header, "footer": footer, "body": content})
+    response = requests.post(
+        settings.PUPPETEER_PDF_URL, json={"header": header, "footer": footer, "body": content}, params=params
+    )
     response.raise_for_status()
     return response.content
 
