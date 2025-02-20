@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import numbers
 import os
 import re
 import subprocess
@@ -107,6 +108,28 @@ def file_path(path):
         path = "file://{0}".format(path)
     return path
 
+boolean_fields = {
+    "displayHeaderFooter",
+    "landscape",
+    "omitBackground",
+    "outline",
+    "preferCSSPageSize",
+    "printBackground",
+    "tagged",
+    "waitForFonts",
+}
+
+
+def convert_to_js_bool(value):
+    # value has to be json representation ('true' not 'True' etc.) for js code to deserialize it correctly
+    js_value = str(bool(value)) if isinstance(value, (bool, numbers.Number)) else str(value)
+    js_value = js_value.lower()
+
+    if js_value not in ("true", "false"):
+        raise ValueError(f"Can't convert {value!r} to 'true' or 'false'")
+
+    return js_value
+
 
 def convert_to_pdf(content: str, header: str = "", footer: str = "", options: dict = None) -> bytes:
     # Clobber header_html and footer_html only if filenames are
@@ -114,9 +137,14 @@ def convert_to_pdf(content: str, header: str = "", footer: str = "", options: di
     # static files.
     # The argument `filename` may be a string or a list. However, puppeteer_pdf
     # will coerce it into a list if a string is passed.
-    params = {"debug": getattr(settings, "PUPPETEER_PDF_DEBUG", os.environ.get("PUPPETEER_PDF_DEBUG", settings.DEBUG))}
-    if options:
-        params.update(options)
+    params = {}  # default options here if needed
+    for key, value in (options or {}).items():
+        if isinstance(value, bool) or key in boolean_fields:
+            try:
+                value = convert_to_js_bool(value)
+            except Exception as e:
+                raise ValueError(f"{e} for {key!r}")
+        params[key] = value
 
     response = requests.post(
         settings.PUPPETEER_PDF_URL, json={"header": header, "footer": footer, "body": content}, params=params
